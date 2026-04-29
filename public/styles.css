@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Kalam:wght@400;700&display=swap');
+
 /* Mobile-First Fully Responsive Design */
 *,
 *::before,
@@ -562,7 +564,7 @@ button {
 .gel-mode .ink-number {
   color: #000000;
   font-family: 'Courier New', monospace;
-  font-weight: 900;
+  font-weight: 200;
   text-shadow: 
     0 0 0 rgba(0, 0, 0, 0.8),
     1px 1px 0px rgba(0, 0, 0, 0.6),

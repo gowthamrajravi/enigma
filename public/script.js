@@ -31,7 +31,7 @@ const TEXT_CONFIG = {
 const overlay = document.getElementById("magicOverlay");
 
 // NEW: Set the exact second your dad flips the blank card around (e.g., 12.5 seconds)
-const REVEAL_TIMESTAMP = 12.5; 
+const REVEAL_TIMESTAMP = 0.5; 
 
 // NEW: Convert coordinates to CSS position
 function getTextPosition() {
