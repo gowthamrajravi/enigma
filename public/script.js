@@ -14,15 +14,15 @@ const PEN_MODE = 'gel'; // Options: 'marker' or 'gel'
 // X: -50 to +50 (left to right, 0 = center)
 // Y: -50 to +50 (top to bottom, 0 = center)
 const TEXT_POSITION = {
-  x: 0,  // Horizontal offset from center (-50 = far left, +50 = far right)
-  y: 0   // Vertical offset from center (-50 = far up, +50 = far down)
+  x: -20,  // Horizontal offset from center (-50 = far left, +50 = far right)
+  y: -25   // Vertical offset from center (-50 = far up, +50 = far down)
 };
 
 // NEW: Text customization variables
 const TEXT_CONFIG = {
   opacity: 1,
   rotation: -1.5,
-  scale: 1.02,
+  scale: 2,
   fontSize: '3rem',
   letterSpacing: '0.15em'
 };
@@ -31,7 +31,7 @@ const TEXT_CONFIG = {
 const overlay = document.getElementById("magicOverlay");
 
 // NEW: Set the exact second your dad flips the blank card around (e.g., 12.5 seconds)
-const REVEAL_TIMESTAMP = 0.5; 
+const REVEAL_TIMESTAMP = 0.0; 
 
 // NEW: Convert coordinates to CSS position
 function getTextPosition() {
@@ -52,7 +52,7 @@ function applyTextStyle() {
   // Remove any existing mode classes
   document.body.classList.remove('marker-mode', 'gel-mode');
   
-  const modeClass = PEN_MODE === 'gel' ? 'gel-mode' : 'marker-mode';
+  const modeClass = PEN_MODE === 'marker' ? 'gel-mode' : 'marker-mode';
   document.body.classList.add(modeClass);
   
   console.log('Applied mode:', modeClass);
