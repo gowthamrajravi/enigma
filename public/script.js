@@ -8,7 +8,7 @@ const video = document.getElementById("revealVideo");
 const restartButton = document.getElementById("restartButton");
 
 // NEW: Pen mode - change to 'gel' for gel pen effect
-const PEN_MODE = 'marker'; // Options: 'marker' or 'gel'
+const PEN_MODE = 'gel'; // Options: 'marker' or 'gel'
 
 // NEW: Text position coordinates (center of video by default)
 // X: -50 to +50 (left to right, 0 = center)
@@ -49,8 +49,13 @@ function getTextPosition() {
 
 // NEW: Apply pen mode and text config
 function applyTextStyle() {
+  // Remove any existing mode classes
+  document.body.classList.remove('marker-mode', 'gel-mode');
+  
   const modeClass = PEN_MODE === 'gel' ? 'gel-mode' : 'marker-mode';
   document.body.classList.add(modeClass);
+  
+  console.log('Applied mode:', modeClass);
   
   // Apply position
   const pos = getTextPosition();
@@ -77,6 +82,7 @@ console.log('X coordinate: -50 (far left) to +50 (far right)');
 console.log('Y coordinate: -50 (far up) to +50 (far down)');
 console.log('Current position:', TEXT_POSITION);
 console.log('Change TEXT_POSITION.x and TEXT_POSITION.y to adjust');
+console.log('Current mode:', PEN_MODE);
 console.log('===========================');
 
 const showStatus = (message, isError = false) => {
@@ -178,7 +184,7 @@ restartButton.addEventListener("click", reset);
 
 input.addEventListener("input", () => {
   sanitizeInput();
-  status.textContent = "";
+  status.text_content = "";
 });
 
 // Prevent zoom on input focus on iOS

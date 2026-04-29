@@ -534,24 +534,51 @@ button {
   transform: translateY(-50%) rotate(0.5deg);
   pointer-events: none;
 }
-/* Gel Pen Mode */
-.gel-mode .ink-number {
-  color: #ffffff;
+
+/* Marker Mode - Whiteboard marker */
+.marker-mode .ink-number {
+  color: #000080;
   font-family: 'Permanent Marker', cursive;
-  font-weight: 300;
+  font-weight: 400;
   text-shadow: 
-    0 0 12px rgba(255, 255, 255, 0.8),
-    1px 1px 0px rgba(255, 255, 255, 0.6),
-    -0.5px -0.5px 1px rgba(0, 0, 0, 0.2);
-  font-size: 2.5rem;
-  letter-spacing: 0.08em;
+    0 0 24px rgba(0, 0, 128, 0.4),
+    2px 2px 0px rgba(173, 216, 230, 0.6),
+    -1px -1px 0px rgba(70, 130, 180, 0.4),
+    1px -1px 0px rgba(173, 216, 230, 0.5),
+    -1px 1px 0px rgba(70, 130, 180, 0.3),
+    0 0 4px rgba(173, 216, 230, 0.8);
+  letter-spacing: 0.15em;
+}
+
+.marker-mode .ink-number::before {
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+}
+
+.marker-mode .ink-number::after {
+  background: linear-gradient(90deg, transparent, rgba(173, 216, 230, 0.4), transparent);
+  height: 2px;
+}
+/* Gel Pen Mode - Authentic black gel pen */
+.gel-mode .ink-number {
+  color: #000000;
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  text-shadow: 
+    0 0 0 rgba(0, 0, 0, 0.8),
+    1px 1px 0px rgba(0, 0, 0, 0.6),
+    2px 2px 0px rgba(0, 0, 0, 0.4),
+    -1px -1px 0px rgba(255, 255, 255, 0.1);
+  font-size: 2.8rem;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .gel-mode .ink-number::before {
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  background: linear-gradient(45deg, transparent 20%, rgba(255, 255, 255, 0.15) 50%, transparent 80%);
 }
 
 .gel-mode .ink-number::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.3), transparent);
+  height: 2px;
 }
