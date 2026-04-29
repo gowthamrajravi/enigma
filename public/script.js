@@ -7,63 +7,72 @@ const cardNumber = document.getElementById("cardNumber");
 const video = document.getElementById("revealVideo");
 const restartButton = document.getElementById("restartButton");
 
-const showStatus = (message, invalid = false) => {
+const showStatus = (message, isError = false) => {
   status.textContent = message;
-  status.style.color = invalid ? "#ff8d8d" : "#b8c4ff";
+  status.style.color = isError ? "#ff8b8b" : "#b8c4ff";
 };
 
-const setFormDisabled = (disabled) => {
-  input.disabled = disabled;
-  form.querySelector('button[type="submit"]').disabled = disabled;
+const toggleForm = (show) => {
+  form.style.display = show ? "flex" : "none";
+  input.disabled = !show;
+  form.querySelector("button").disabled = !show;
 };
 
 const reset = () => {
   revealSection.classList.add("hidden");
-  form.classList.remove("hidden");
+  toggleForm(true);
   status.textContent = "";
   input.value = "";
   input.focus();
-  setFormDisabled(false);
 };
 
 const playReveal = async (num) => {
   try {
-    showStatus("Locking in your number...", false);
-    setFormDisabled(true);
+    showStatus("Locking in your number...");
+    toggleForm(false);
 
     const response = await fetch(`/api/reveal?num=${encodeURIComponent(num)}`);
     if (!response.ok) {
-      const body = await response.json();
-      throw new Error(body.error || "Unable to process number.");
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "Unable to process number.");
     }
 
     const data = await response.json();
     cardNumber.textContent = data.number;
     revealText.textContent = data.message;
 
-    form.classList.add("hidden");
+    form.style.display = "none";
     revealSection.classList.remove("hidden");
+
+    // Scroll to reveal section on mobile
+    if (window.innerWidth < 640) {
+      setTimeout(() => {
+        revealSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+
+    // Reset and play video
     video.currentTime = 0;
-    await video.play().catch(() => null);
+    await video.play().catch(() => {});
     showStatus("");
   } catch (error) {
     showStatus(error.message, true);
-    setFormDisabled(false);
+    toggleForm(true);
   }
 };
 
-const sanitizeDigits = () => {
-  const cleaned = input.value.replace(/[^0-9]/g, "").slice(0, 2);
-  if (input.value !== cleaned) input.value = cleaned;
+const sanitizeInput = () => {
+  const val = input.value.replace(/[^0-9]/g, "").slice(0, 2);
+  if (input.value !== val) input.value = val;
 };
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  sanitizeDigits();
+  sanitizeInput();
 
   const value = input.value.trim();
   if (!/^\d{2}$/.test(value)) {
-    showStatus("Enter exactly two digits, like 07 or 88.", true);
+    showStatus("Enter exactly two digits (00-99).", true);
     return;
   }
 
@@ -71,7 +80,15 @@ form.addEventListener("submit", (event) => {
 });
 
 restartButton.addEventListener("click", reset);
+
 input.addEventListener("input", () => {
-  sanitizeDigits();
+  sanitizeInput();
   status.textContent = "";
 });
+
+// Prevent zoom on input focus on iOS
+document.addEventListener("touchstart", (e) => {
+  if (e.target === input) {
+    e.target.style.fontSize = "16px";
+  }
+}, false);
