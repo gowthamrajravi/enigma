@@ -10,9 +10,16 @@ const restartButton = document.getElementById("restartButton");
 // NEW: Pen mode - change to 'gel' for gel pen effect
 const PEN_MODE = 'marker'; // Options: 'marker' or 'gel'
 
+// NEW: Text position coordinates (center of video by default)
+// X: -50 to +50 (left to right, 0 = center)
+// Y: -50 to +50 (top to bottom, 0 = center)
+const TEXT_POSITION = {
+  x: 0,  // Horizontal offset from center (-50 = far left, +50 = far right)
+  y: 0   // Vertical offset from center (-50 = far up, +50 = far down)
+};
+
 // NEW: Text customization variables
 const TEXT_CONFIG = {
-  position: { top: '62%', left: '50%' },
   opacity: 1,
   rotation: -1.5,
   scale: 1.02,
@@ -26,22 +33,51 @@ const overlay = document.getElementById("magicOverlay");
 // NEW: Set the exact second your dad flips the blank card around (e.g., 12.5 seconds)
 const REVEAL_TIMESTAMP = 12.5; 
 
+// NEW: Convert coordinates to CSS position
+function getTextPosition() {
+  const centerX = 50; // 50% = center horizontally
+  const centerY = 62; // 62% = center vertically (adjusted for video)
+  
+  const xPercent = centerX + TEXT_POSITION.x;
+  const yPercent = centerY + TEXT_POSITION.y;
+  
+  return {
+    left: `${xPercent}%`,
+    top: `${yPercent}%`
+  };
+}
+
 // NEW: Apply pen mode and text config
 function applyTextStyle() {
   const modeClass = PEN_MODE === 'gel' ? 'gel-mode' : 'marker-mode';
   document.body.classList.add(modeClass);
   
-  // Apply custom styles
-  cardNumber.style.top = TEXT_CONFIG.position.top;
-  cardNumber.style.left = TEXT_CONFIG.position.left;
+  // Apply position
+  const pos = getTextPosition();
+  cardNumber.style.left = pos.left;
+  cardNumber.style.top = pos.top;
+  
+  // Apply other custom styles
   cardNumber.style.opacity = TEXT_CONFIG.opacity;
   cardNumber.style.transform = `rotate(${TEXT_CONFIG.rotation}deg) scale(${TEXT_CONFIG.scale})`;
   cardNumber.style.fontSize = TEXT_CONFIG.fontSize;
   cardNumber.style.letterSpacing = TEXT_CONFIG.letterSpacing;
+  
+  // Debug coordinates in console
+  console.log('Text Position:', TEXT_POSITION);
+  console.log('CSS Position:', pos);
 }
 
 // Call it on load
 applyTextStyle();
+
+// Add coordinate guides to console
+console.log('=== TEXT POSITION GUIDES ===');
+console.log('X coordinate: -50 (far left) to +50 (far right)');
+console.log('Y coordinate: -50 (far up) to +50 (far down)');
+console.log('Current position:', TEXT_POSITION);
+console.log('Change TEXT_POSITION.x and TEXT_POSITION.y to adjust');
+console.log('===========================');
 
 const showStatus = (message, isError = false) => {
   status.textContent = message;

@@ -536,22 +536,22 @@ button {
 }
 /* Gel Pen Mode */
 .gel-mode .ink-number {
-  color: #000000;
+  color: #ffffff;
   font-family: 'Permanent Marker', cursive;
   font-weight: 300;
   text-shadow: 
-    0 0 8px rgba(0, 0, 0, 0.3),
-    1px 1px 0px rgba(0, 0, 0, 0.2),
-    -0.5px -0.5px 1px rgba(255, 255, 255, 0.1);
+    0 0 12px rgba(255, 255, 255, 0.8),
+    1px 1px 0px rgba(255, 255, 255, 0.6),
+    -0.5px -0.5px 1px rgba(0, 0, 0, 0.2);
   font-size: 2.5rem;
   letter-spacing: 0.08em;
 }
 
 .gel-mode .ink-number::before {
-  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
 }
 
 .gel-mode .ink-number::after {
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   height: 1px;
 }
