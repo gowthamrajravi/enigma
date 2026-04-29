@@ -7,11 +7,41 @@ const cardNumber = document.getElementById("cardNumber");
 const video = document.getElementById("revealVideo");
 const restartButton = document.getElementById("restartButton");
 
+// NEW: Pen mode - change to 'gel' for gel pen effect
+const PEN_MODE = 'marker'; // Options: 'marker' or 'gel'
+
+// NEW: Text customization variables
+const TEXT_CONFIG = {
+  position: { top: '62%', left: '50%' },
+  opacity: 1,
+  rotation: -1.5,
+  scale: 1.02,
+  fontSize: '3rem',
+  letterSpacing: '0.15em'
+};
+
 // NEW: Get the magic overlay container
 const overlay = document.getElementById("magicOverlay");
 
 // NEW: Set the exact second your dad flips the blank card around (e.g., 12.5 seconds)
-const REVEAL_TIMESTAMP = 0.5; 
+const REVEAL_TIMESTAMP = 12.5; 
+
+// NEW: Apply pen mode and text config
+function applyTextStyle() {
+  const modeClass = PEN_MODE === 'gel' ? 'gel-mode' : 'marker-mode';
+  document.body.classList.add(modeClass);
+  
+  // Apply custom styles
+  cardNumber.style.top = TEXT_CONFIG.position.top;
+  cardNumber.style.left = TEXT_CONFIG.position.left;
+  cardNumber.style.opacity = TEXT_CONFIG.opacity;
+  cardNumber.style.transform = `rotate(${TEXT_CONFIG.rotation}deg) scale(${TEXT_CONFIG.scale})`;
+  cardNumber.style.fontSize = TEXT_CONFIG.fontSize;
+  cardNumber.style.letterSpacing = TEXT_CONFIG.letterSpacing;
+}
+
+// Call it on load
+applyTextStyle();
 
 const showStatus = (message, isError = false) => {
   status.textContent = message;
@@ -118,6 +148,6 @@ input.addEventListener("input", () => {
 // Prevent zoom on input focus on iOS
 document.addEventListener("touchstart", (e) => {
   if (e.target === input) {
-    e.target.style.fontSize = "36px";
+    e.target.style.fontSize = "16px";
   }
 }, false);
