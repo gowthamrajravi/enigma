@@ -15,29 +15,15 @@
     <section class="hero">
       <div class="hero-content">
         <span class="badge">M I N D R E V E A L</span>
-        
         <h1 class="title">The moment you choose, the card already knows.</h1>
-        
         <p class="description">Type any two-digit number and the screen will reveal your exact choice with cinematic certainty.</p>
 
         <form id="chooser" class="form" autocomplete="off">
           <label for="numberInput" class="form-label">Your number</label>
-          
           <div class="form-input-group">
-            <input 
-              id="numberInput" 
-              name="numberInput" 
-              type="tel" 
-              maxlength="2" 
-              placeholder="42" 
-              inputmode="numeric" 
-              autocomplete="off" 
-              autofocus 
-              class="form-input"
-            />
+            <input id="numberInput" name="numberInput" type="tel" maxlength="2" placeholder="42" inputmode="numeric" autocomplete="off" autofocus class="form-input" />
             <button type="submit" class="form-button">Reveal</button>
           </div>
-          
           <div id="status" class="form-status"></div>
         </form>
       </div>
@@ -53,22 +39,22 @@
       </aside>
     </section>
 
- 
-  <div class="video-container">
-    <video id="revealVideo" playsinline preload="metadata">
-      <source src="video.mp4" type="video/mp4" />
-    </video>
-    
-    <div id="magicOverlay" class="ink-overlay">
-      <div id="cardNumber" class="ink-number"></div>
-    </div>
+    <!-- Reveal Section -->
+    <section id="revealSection" class="reveal hidden">
+      <div class="video-container">
+        <video id="revealVideo" playsinline preload="metadata">
+          <source src="video.mp4" type="video/mp4" />
+        </video>
+        <div id="magicOverlay" class="ink-overlay">
+          <div id="cardNumber" class="ink-number"></div>
+        </div>
+      </div>
+      <div class="reveal-text-area">
+        <p id="revealText" class="reveal-message"></p>
+        <button id="restartButton" class="button-secondary">Try another number</button>
+      </div>
+    </section>
   </div>
-
-  <div class="reveal-text-area">
-    <p id="revealText" class="reveal-message"></p>
-    <button id="restartButton" class="button-secondary">Try another number</button>
-  </div>
-</section>
 
   <script src="script.js"></script>
 </body>

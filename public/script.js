@@ -11,7 +11,7 @@ const restartButton = document.getElementById("restartButton");
 const overlay = document.getElementById("magicOverlay");
 
 // NEW: Set the exact second your dad flips the blank card around (e.g., 12.5 seconds)
-const REVEAL_TIMESTAMP = 12.5; 
+const REVEAL_TIMESTAMP = 0.5; 
 
 const showStatus = (message, isError = false) => {
   status.textContent = message;
@@ -118,6 +118,6 @@ input.addEventListener("input", () => {
 // Prevent zoom on input focus on iOS
 document.addEventListener("touchstart", (e) => {
   if (e.target === input) {
-    e.target.style.fontSize = "16px";
+    e.target.style.fontSize = "36px";
   }
 }, false);
