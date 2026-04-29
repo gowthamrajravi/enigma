@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mind Connection</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <span class="badge">M I N D  R E V E A L</span>
+        <h1>The moment you choose, the card already knows.</h1>
+        <p class="subtitle">Type any two-digit number and the screen will reveal your exact choice with cinematic certainty.</p>
+
+        <form id="chooser" class="input-panel" autocomplete="off">
+          <label for="numberInput">Your number</label>
+          <div class="field-row">
+            <input id="numberInput" name="numberInput" type="text" maxlength="2" pattern="[0-9]{2}"
+              placeholder="42" inputmode="numeric" autocomplete="off" autofocus />
+            <button type="submit">Reveal</button>
+          </div>
+          <div id="status" class="status"></div>
+        </form>
+      </div>
+
+      <aside class="hero-visual">
+        <div class="visual-shell">
+          <div class="visual-card">
+            <div class="visual-glow"></div>
+            <div class="visual-text">Blank card. Blank intention.</div>
+          </div>
+          <p class="visual-caption">A subtle promise before the reveal.</p>
+        </div>
+      </aside>
+    </header>
+
+    <section id="revealSection" class="reveal-stage hidden">
+      <div class="scene-frame">
+        <div class="video-shell">
+          <video id="revealVideo" playsinline preload="metadata" muted>
+            <source src="video.mp4" type="video/mp4" />
+            Your browser does not support video playback.
+          </video>
+          <div class="card-overlay">
+            <span class="overlay-label">Your number is</span>
+            <div id="cardNumber" class="overlay-number">42</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-copy">
+        <p id="revealText" class="reveal-text"></p>
+        <button id="restartButton" class="secondary-button">Try another number</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
