@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,25 +53,22 @@
       </aside>
     </section>
 
-    <!-- Reveal Section -->
-    <section id="revealSection" class="reveal hidden">
-      <div class="video-container">
-        <video id="revealVideo" playsinline preload="metadata" muted>
-          <source src="video.mp4" type="video/mp4" />
-        </video>
-        
-        <div class="overlay-card">
-          <div class="overlay-label">Your number is</div>
-          <div id="cardNumber" class="overlay-number">42</div>
-        </div>
-      </div>
-
-      <div class="reveal-text-area">
-        <p id="revealText" class="reveal-message"></p>
-        <button id="restartButton" class="button-secondary">Try another number</button>
-      </div>
-    </section>
+ 
+  <div class="video-container">
+    <video id="revealVideo" playsinline preload="metadata">
+      <source src="video.mp4" type="video/mp4" />
+    </video>
+    
+    <div id="magicOverlay" class="ink-overlay">
+      <div id="cardNumber" class="ink-number"></div>
+    </div>
   </div>
+
+  <div class="reveal-text-area">
+    <p id="revealText" class="reveal-message"></p>
+    <button id="restartButton" class="button-secondary">Try another number</button>
+  </div>
+</section>
 
   <script src="script.js"></script>
 </body>

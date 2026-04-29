@@ -281,39 +281,37 @@ button {
   height: 100%;
   display: block;
 }
-
-.overlay-card {
+/* Replace old overlay CSS with this Realistic Ink CSS */
+.ink-overlay {
   position: absolute;
+  /* You will need to tweak top and left to match where your dad holds the card */
+  top: 60%; 
   left: 50%;
-  top: 55%;
-  transform: translate(-50%, -50%);
-  width: min(85%, 300px);
-  padding: 16px 20px;
-  background: rgba(8, 10, 18, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  text-align: center;
+  /* The slight rotation makes it look human, not perfectly straight */
+  transform: translate(-50%, -50%) rotate(-2deg); 
+  
+  /* Hidden by default until the exact moment he shows the card */
+  opacity: 0; 
+  transition: opacity 0.1s ease-in; /* Quick fade in */
+  z-index: 10;
+  pointer-events: none; /* Prevents text from blocking video clicks */
 }
 
-.overlay-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(205, 220, 255, 0.85);
-  font-weight: 600;
-}
-
-.overlay-number {
+.ink-number {
   margin: 0;
-  font-size: 3rem;
+  font-family: 'Permanent Marker', cursive; /* Realistic marker font */
+  font-size: 6rem; /* Adjust based on video size */
   line-height: 1;
-  color: #fafcff;
-  font-weight: 700;
-  text-shadow: 0 0 24px rgba(138, 166, 255, 0.2);
+  /* Dark grey is more realistic than pure #000 black */
+  color: rgba(20, 20, 20, 0.85); 
+  
+  /* THE SECRET SAUCE: Forces the text to interact with the video's lighting/shadows */
+  mix-blend-mode: multiply; 
+}
+
+/* Update media queries for the ink-number if needed */
+@media (max-width: 399px) {
+  .ink-number { font-size: 4rem; }
 }
 
 .reveal-text-area {
