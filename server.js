@@ -14,9 +14,7 @@ app.get(SECRET_ADMIN_URL, (req, res) => {
     // Notice we are NOT looking in the 'public' folder anymore
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
-app.get('*', (req, res) => {
-    res.redirect('/');
-});
+
 
 // --- YOUR JSONBIN DETAILS ---
 const BIN_ID = '69f78eb236566621a81eaf29';
@@ -53,6 +51,10 @@ app.post('/api/data', async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to save data to JSONBin' });
     }
+});
+
+app.get('*', (req, res) => {
+    res.redirect('/');
 });
 
 app.listen(PORT, () => {
