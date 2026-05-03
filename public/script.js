@@ -8,7 +8,7 @@ const video = document.getElementById("revealVideo");
 const restartButton = document.getElementById("restartButton");
 
 // NEW: Pen mode - change to 'gel' for gel pen effect
-const PEN_MODE = 'gel'; // Options: 'marker' or 'gel'
+const PEN_MODE = 'marker'; // Options: 'marker' or 'gel'
 
 // NEW: Text position coordinates (center of video by default)
 // X: -50 to +50 (left to right, 0 = center)
@@ -52,25 +52,12 @@ function applyTextStyle() {
   // Remove any existing mode classes
   document.body.classList.remove('marker-mode', 'gel-mode');
   
-  const modeClass = PEN_MODE === 'marker' ? 'gel-mode' : 'marker-mode';
+  const modeClass = PEN_MODE === 'marker' ? 'marker-mode' : 'gel-mode';
   document.body.classList.add(modeClass);
   
   console.log('Applied mode:', modeClass);
   
-  // Apply position
-  const pos = getTextPosition();
-  cardNumber.style.left = pos.left;
-  cardNumber.style.top = pos.top;
-  
-  // Apply other custom styles
-  cardNumber.style.opacity = TEXT_CONFIG.opacity;
-  cardNumber.style.transform = `rotate(${TEXT_CONFIG.rotation}deg) scale(${TEXT_CONFIG.scale})`;
-  cardNumber.style.fontSize = TEXT_CONFIG.fontSize;
-  cardNumber.style.letterSpacing = TEXT_CONFIG.letterSpacing;
-  
-  // Debug coordinates in console
-  console.log('Text Position:', TEXT_POSITION);
-  console.log('CSS Position:', pos);
+  // Relying on CSS for positioning and styling now!
 }
 
 // Call it on load
@@ -96,6 +83,37 @@ const toggleForm = (show) => {
   form.querySelector("button").disabled = !show;
 };
 
+// Camera tracking settings to simulate handheld camera movement matching the video
+const CAMERA_TRACKING = {
+  enabled: true,
+  amplitudeY: 4,      // pixels to move up and down (adjust if the camera moves more/less)
+  frequency: 1.5,     // speed of the camera breathing
+  phase: 0            // offset to match the video's exact motion
+};
+
+let trackingFrame;
+
+// NEW: Continuously track and offset the text to match camera wobble
+function trackCamera() {
+  if (!video.paused && !video.ended && CAMERA_TRACKING.enabled) {
+    const t = video.currentTime;
+    // A sine wave based on video time to simulate human breathing/handheld camera bob
+    const offsetY = Math.sin(t * Math.PI * CAMERA_TRACKING.frequency + CAMERA_TRACKING.phase) * CAMERA_TRACKING.amplitudeY;
+    const offsetX = Math.cos(t * Math.PI * (CAMERA_TRACKING.frequency * 0.7) + CAMERA_TRACKING.phase) * (CAMERA_TRACKING.amplitudeY * 0.3); // slight left/right
+    
+    overlay.style.setProperty('--camera-x', `${offsetX}px`);
+    overlay.style.setProperty('--camera-y', `${offsetY}px`);
+    
+    trackingFrame = requestAnimationFrame(trackCamera);
+  }
+}
+
+// Ensure we track the camera whenever the video is playing
+video.addEventListener('play', () => {
+  if (trackingFrame) cancelAnimationFrame(trackingFrame);
+  trackCamera();
+});
+
 // NEW: We define the timing checker separately so we can safely remove it later
 const timeChecker = () => {
   if (video.currentTime >= REVEAL_TIMESTAMP) {
@@ -112,6 +130,7 @@ const reset = () => {
   
   // NEW: Reset the video and hide the overlay so the trick works a second time
   video.pause();
+  if (trackingFrame) cancelAnimationFrame(trackingFrame);
   video.removeEventListener("timeupdate", timeChecker); 
   overlay.style.opacity = "0"; 
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - TN Elections</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="admin-header">
+        <h1>Admin Control Center</h1>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button id="declare-results-btn" class="danger-btn">🎉 TRIGGER FINALE 🎉</button>
+            <button id="reset-finale-btn" style="background-color: #64748b; margin: 0; width: auto;">🛑 RESET FINALE
+                🛑</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-card" style="display:block;">
+            <h2>Update Live Results</h2>
+            <div class="input-grid" id="live-inputs"></div>
+            <button onclick="saveAdminData()">Save Live Results</button>
+        </section>
+
+        <section class="admin-card" style="display:block;">
+            <h2>Family Predictions</h2>
+            <button onclick="addNewMember()" style="margin-bottom:1rem;">+ Add New Member</button>
+            <div id="predictions-editor"></div>
+            <button onclick="saveAdminData()">Save All Changes</button>
+        </section>
+    </main>
+    <script src="admin.js"></script>
+</body>
+
+</html>

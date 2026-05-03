@@ -1,0 +1,148 @@
+{
+  "lastRefreshed": "Not yet updated",
+  "finaleTriggered": false,
+  "liveActuals": {
+    "AIADMK": 0,
+    "DMK": 0,
+    "NTK": 0,
+    "TVK": 0,
+    "OTHERS": 0
+  },
+  "predictions": [
+    {
+      "id": 1,
+      "name": "S.RAVI",
+      "AIADMK": 130,
+      "DMK": 100,
+      "NTK": 0,
+      "TVK": 4,
+      "OTHERS": 0
+    },
+    {
+      "id": 2,
+      "name": "J.UJJEEVANATHAN",
+      "AIADMK": 200,
+      "DMK": 10,
+      "NTK": 0,
+      "TVK": 24,
+      "OTHERS": 0
+    },
+    {
+      "id": 3,
+      "name": "S.RAMESH",
+      "AIADMK": 120,
+      "DMK": 95,
+      "NTK": 1,
+      "TVK": 12,
+      "OTHERS": 0
+    },
+    {
+      "id": 4,
+      "name": "HEMA RAMESH",
+      "AIADMK": 165,
+      "DMK": 45,
+      "NTK": 1,
+      "TVK": 24,
+      "OTHERS": 0
+    },
+    {
+      "id": 5,
+      "name": "GOWRI SUNDARAMAN",
+      "AIADMK": 110,
+      "DMK": 100,
+      "NTK": 2,
+      "TVK": 18,
+      "OTHERS": 0
+    },
+    {
+      "id": 6,
+      "name": "SS.SIVAKUMAR",
+      "AIADMK": 108,
+      "DMK": 93,
+      "NTK": 0,
+      "TVK": 38,
+      "OTHERS": 0
+    },
+    {
+      "id": 7,
+      "name": "J JAYAKUMAR",
+      "AIADMK": 80,
+      "DMK": 100,
+      "NTK": 0,
+      "TVK": 30,
+      "OTHERS": 0
+    },
+    {
+      "id": 8,
+      "name": "SAMPATH.S",
+      "AIADMK": 122,
+      "DMK": 98,
+      "NTK": 3,
+      "TVK": 8,
+      "OTHERS": 0
+    },
+    {
+      "id": 9,
+      "name": "GUGAN.S",
+      "AIADMK": 147,
+      "DMK": 82,
+      "NTK": 0,
+      "TVK": 2,
+      "OTHERS": 0
+    },
+    {
+      "id": 10,
+      "name": "GOWTHAMRAJ.R",
+      "AIADMK": 110,
+      "DMK": 102,
+      "NTK": 1,
+      "TVK": 20,
+      "OTHERS": 1
+    },
+    {
+      "id": 11,
+      "name": "SARANYA UJJEEV",
+      "AIADMK": 100,
+      "DMK": 80,
+      "NTK": 0,
+      "TVK": 50,
+      "OTHERS": 3
+    },
+    {
+      "id": 12,
+      "name": "DIWAKAR.S",
+      "AIADMK": 115,
+      "DMK": 95,
+      "NTK": 1,
+      "TVK": 10,
+      "OTHERS": 0
+    },
+    {
+      "id": 13,
+      "name": "VIVEK.B",
+      "AIADMK": 95,
+      "DMK": 100,
+      "NTK": 1,
+      "TVK": 38,
+      "OTHERS": 4
+    },
+    {
+      "id": 14,
+      "name": "VARADHARAJAN.V",
+      "AIADMK": 44,
+      "DMK": 120,
+      "NTK": 0,
+      "TVK": 44,
+      "OTHERS": 0
+    },
+    {
+      "id": 15,
+      "name": "DEEPA VARADHARAJAN",
+      "AIADMK": 44,
+      "DMK": 128,
+      "NTK": 0,
+      "TVK": 62,
+      "OTHERS": 0
+    }
+  ]
+}

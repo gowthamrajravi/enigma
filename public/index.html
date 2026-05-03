@@ -1,61 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Mind Connection</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TN 2026 Election Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <div class="app-container">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-content">
-        <span class="badge">M I N D R E V E A L</span>
-        <h1 class="title">The moment you choose, the card already knows.</h1>
-        <p class="description">Type any two-digit number and the screen will reveal your exact choice with cinematic certainty.</p>
+    <header>
+        <h1>Parapava Election Results</h1>
+        <p>A Family Prediction Initiative by <strong>Mr. Ramesh Subramanian</strong></p>
+        <p class="refresh-time">Last Refreshed: <span id="time-display">--:--</span></p>
+    </header>
 
-        <form id="chooser" class="form" autocomplete="off">
-          <label for="numberInput" class="form-label">Your number</label>
-          <div class="form-input-group">
-            <input id="numberInput" name="numberInput" type="tel" maxlength="2" placeholder="42" inputmode="numeric" autocomplete="off" autofocus class="form-input" />
-            <button type="submit" class="form-button">Reveal</button>
-          </div>
-          <div id="status" class="form-status"></div>
-        </form>
-      </div>
-
-      <aside class="hero-visual">
-        <div class="card-preview">
-          <div class="card-glow"></div>
-          <div class="card-inner">
-            <span class="card-text">Blank card.<br/>Blank intention.</span>
-          </div>
+    <main>
+        <!-- UPDATED: Live Real-World Election Standings -->
+        <div class="card" style="display: block; margin-bottom: 2rem; border-top: 5px solid #10b981;">
+            <h2 style="margin-top: 0; color: #1e3a8a;">📊 Official Live Results</h2>
+            <p style="color: #64748b; margin-top: -10px; margin-bottom: 1rem;">
+                Real-time seat distribution. <br>
+                <strong style="color: #0f172a; font-size: 1.1rem;">Total Seats Counted: <span
+                        id="seats-counted">0</span> / 234</strong>
+            </p>
+            <div id="live-standings-wrapper"
+                style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <p id="waiting-message" style="color: #64748b; font-style: italic;">Waiting for live results to begin...
+                </p>
+                <canvas id="liveStandingsChart" style="display: none;"></canvas>
+            </div>
         </div>
-        <p class="card-caption">A subtle promise before the reveal.</p>
-      </aside>
-    </section>
 
-    <!-- Reveal Section -->
-    <section id="revealSection" class="reveal hidden">
-      <div class="video-container">
-        <video id="revealVideo" playsinline preload="metadata">
-          <source src="video.mp4" type="video/mp4" />
-        </video>
-        <div id="magicOverlay" class="ink-overlay">
-          <div id="cardNumber" class="ink-number"></div>
+        <!-- Advanced Analytics Panel -->
+        <div class="insights-container">
+            <div class="insight-box">
+                <h3>👥 Family Consensus (Mean Average)</h3>
+                <p id="family-average-text">Calculating...</p>
+                <small>The collective prediction of all family members combined.</small>
+            </div>
+            <div class="insight-box">
+                <h3>🎯 The "Wisdom of the Crowd"</h3>
+                <p id="closest-to-average" style="font-weight: bold; color: #1e3a8a;">Calculating...</p>
+                <small>The person whose prediction has the minimum variance from the family average.</small>
+            </div>
         </div>
-      </div>
-      <div class="reveal-text-area">
-        <p id="revealText" class="reveal-message"></p>
-        <button id="restartButton" class="button-secondary">Try another number</button>
-      </div>
-    </section>
-  </div>
 
-  <script src="script.js"></script>
+        <div class="leaderboard-container">
+            <h2>Live Leaderboard</h2>
+            <p style="text-align:center; color:#64748b; margin-bottom:1rem;">Click on any family member to see their Pie
+                Chart breakdown!</p>
+            <div id="leaderboard"></div>
+        </div>
+    </main>
+
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="modal show">
+        <div class="modal-content">
+            <h2>Welcome to the Arena!</h2>
+            <p>Mr. Ramesh Subramanian challenges the family: Who has the best political instincts?</p>
+            <p>Scores are calculated dynamically based on the ratio of predicted seats versus actual live results.</p>
+            <button onclick="document.getElementById('welcome-modal').classList.remove('show')">Let's Go!</button>
+        </div>
+    </div>
+
+    <!-- Dual Pie Chart Modal -->
+    <div id="chart-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px; width: 90%;">
+            <h2 id="chart-title">Prediction Breakdown</h2>
+            <p id="chart-subtitle" style="color: #64748b; margin-bottom: 20px;"></p>
+
+            <div class="charts-wrapper">
+                <div class="chart-half">
+                    <h3>Predicted</h3>
+                    <div id="predicted-chart-container"><canvas id="predictedChart"></canvas></div>
+                </div>
+                <div class="chart-half">
+                    <h3>Live Actuals</h3>
+                    <div id="actual-chart-container"><canvas id="actualChart"></canvas></div>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('chart-modal').classList.remove('show')"
+                style="margin-top: 20px;">Close Analytics</button>
+        </div>
+    </div>
+
+    <!-- Spectacle Modal -->
+    <div id="spectacle-modal" class="modal">
+        <div class="modal-content finale">
+            <h1>🏆 THE RESULTS ARE IN 🏆</h1>
+            <h2 id="winner-name"></h2>
+            <p>is the Ultimate Political Analyst!</p>
+            <h3 id="winner-score"></h3>
+            <button onclick="document.getElementById('spectacle-modal').classList.remove('show')">View Final
+                Standings</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
+
 </html>
