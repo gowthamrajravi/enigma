@@ -148,14 +148,31 @@ function renderLeaderboard() {
     const container = document.getElementById('leaderboard');
     container.innerHTML = '';
 
-    const scoredPredictions = appState.predictions.map(p => {
+    const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
+    const sortMethod = document.getElementById('sort-select')?.value || 'accuracy-desc';
+
+    let processedPredictions = appState.predictions.map(p => {
         const calc = calculateAccuracy(p, appState.liveActuals);
-        p.score = calc.score;
+        p.score = parseFloat(calc.score);
         p.seatsOff = calc.seatsOff;
         return p;
-    }).sort((a, b) => b.score - a.score);
+    });
 
-    scoredPredictions.forEach((member, displayIndex) => {
+    if (searchQuery) {
+        processedPredictions = processedPredictions.filter(p => p.name.toLowerCase().includes(searchQuery));
+    }
+
+    processedPredictions.sort((a, b) => {
+        switch (sortMethod) {
+            case 'accuracy-desc': return b.score - a.score;
+            case 'accuracy-asc': return a.score - b.score;
+            case 'seats-asc': return a.seatsOff - b.seatsOff;
+            case 'name-asc': return a.name.localeCompare(b.name);
+            default: return b.score - a.score;
+        }
+    });
+
+    processedPredictions.forEach((member, displayIndex) => {
         const div = document.createElement('div');
         const originalIndex = appState.predictions.findIndex(p => p.id === member.id);
 
