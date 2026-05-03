@@ -6,7 +6,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
 app.use(express.static(path.join(__dirname, 'public')));
+const SECRET_ADMIN_URL = '/ramesh-master-vault-2026';
+
+app.get(SECRET_ADMIN_URL, (req, res) => {
+    // Notice we are NOT looking in the 'public' folder anymore
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+app.get('*', (req, res) => {
+    res.redirect('/');
+});
 
 // --- YOUR JSONBIN DETAILS ---
 const BIN_ID = '69f78eb236566621a81eaf29';
