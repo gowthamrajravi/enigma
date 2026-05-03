@@ -3,6 +3,7 @@ let finaleShown = false;
 let predictedChartObj = null;
 let actualChartObj = null;
 let liveStandingsChartObj = null;
+let initialLoadComplete = false; // NEW: Tracks loading state
 
 const parties = ['AIADMK', 'DMK', 'NTK', 'TVK', 'OTHERS'];
 const chartColors = ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#94a3b8'];
@@ -11,6 +12,13 @@ async function fetchLiveResults() {
     try {
         const res = await fetch('/api/data');
         appState = await res.json();
+
+        // NEW: Hide loader and show main content once data arrives
+        if (!initialLoadComplete) {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            initialLoadComplete = true;
+        }
 
         document.getElementById('time-display').innerText = appState.lastRefreshed;
 
@@ -23,6 +31,7 @@ async function fetchLiveResults() {
         }
     } catch (e) {
         console.error("Waiting for server data...");
+        // Keeps the loader spinning if Vercel is still booting up
     }
 }
 
@@ -33,13 +42,11 @@ function renderLiveStandingsChart() {
     let totalCounted = 0;
     parties.forEach(p => totalCounted += actuals[p]);
 
-    // Update Counter Text
     document.getElementById('seats-counted').innerText = totalCounted;
 
     const waitingMsg = document.getElementById('waiting-message');
     const canvas = document.getElementById('liveStandingsChart');
 
-    // Conditional Rendering based on 0 seats
     if (totalCounted === 0) {
         waitingMsg.style.display = 'block';
         canvas.style.display = 'none';
@@ -194,7 +201,6 @@ function showChart(memberIndex) {
     const predContainer = document.getElementById('predicted-chart-container');
     const actContainer = document.getElementById('actual-chart-container');
 
-    // 1. Predicted Chart (Always shows)
     predContainer.innerHTML = '<canvas id="predictedChart"></canvas>';
     const ctxPred = document.getElementById('predictedChart').getContext('2d');
     predictedChartObj = new Chart(ctxPred, {
@@ -210,7 +216,6 @@ function showChart(memberIndex) {
         options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
 
-    // 2. Actuals Chart (Conditional Zero-State)
     if (totalActuals === 0) {
         actContainer.innerHTML = '<p style="color:#64748b; font-style:italic; margin-top:50px;">Waiting for actual results...</p>';
     } else {

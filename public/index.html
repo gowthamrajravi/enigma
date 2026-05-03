@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TN 2026 Election Dashboard</title>
+    <title>Parapava Election Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,13 +12,20 @@
 
 <body>
     <header>
-        <h1>Parapava Election Results</h1>
+        <h1>TN 2026 Election Results</h1>
         <p>A Family Prediction Initiative by <strong>Mr. Ramesh Subramanian</strong></p>
         <p class="refresh-time">Last Refreshed: <span id="time-display">--:--</span></p>
     </header>
 
-    <main>
-        <!-- UPDATED: Live Real-World Election Standings -->
+    <!-- NEW: Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p>Fetching Live Election Data...</p>
+    </div>
+
+    <!-- main content hidden until data loads -->
+    <main id="main-content" style="display: none;">
+        <!-- Live Real-World Election Standings -->
         <div class="card" style="display: block; margin-bottom: 2rem; border-top: 5px solid #10b981;">
             <h2 style="margin-top: 0; color: #1e3a8a;">📊 Official Live Results</h2>
             <p style="color: #64748b; margin-top: -10px; margin-bottom: 1rem;">
@@ -66,10 +73,13 @@
         </div>
     </div>
 
-    <!-- Dual Pie Chart Modal -->
     <div id="chart-modal" class="modal">
         <div class="modal-content" style="max-width: 800px; width: 90%;">
-            <h2 id="chart-title">Prediction Breakdown</h2>
+            <!-- NEW: Floating Close Button -->
+            <button class="floating-close-btn"
+                onclick="document.getElementById('chart-modal').classList.remove('show')">✖ Close</button>
+
+            <h2 id="chart-title" style="margin-top: 10px;">Prediction Breakdown</h2>
             <p id="chart-subtitle" style="color: #64748b; margin-bottom: 20px;"></p>
 
             <div class="charts-wrapper">
@@ -82,9 +92,6 @@
                     <div id="actual-chart-container"><canvas id="actualChart"></canvas></div>
                 </div>
             </div>
-
-            <button onclick="document.getElementById('chart-modal').classList.remove('show')"
-                style="margin-top: 20px;">Close Analytics</button>
         </div>
     </div>
 
