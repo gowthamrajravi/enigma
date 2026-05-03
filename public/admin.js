@@ -2,10 +2,18 @@ let adminState = null;
 const parties = ['AIADMK', 'DMK', 'NTK', 'TVK', 'OTHERS'];
 
 async function loadAdminData() {
-    const res = await fetch('/api/data');
-    adminState = await res.json();
-    renderLiveInputs();
-    renderPredictionsEditor();
+    try {
+        const res = await fetch('/api/data');
+        adminState = await res.json();
+        
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+
+        renderLiveInputs();
+        renderPredictionsEditor();
+    } catch (e) {
+        console.error("Error loading admin data:", e);
+    }
 }
 
 function renderLiveInputs() {
