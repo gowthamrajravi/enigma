@@ -32,10 +32,11 @@ function renderLiveInputs() {
 function renderPredictionsEditor() {
     const container = document.getElementById('predictions-editor');
     container.innerHTML = `
-        <div class="member-row" style="font-weight:bold; margin-top:1rem; padding-bottom: 0; border: none;">
+        <div class="member-row header-row" style="font-weight:bold; margin-top:1rem; padding-bottom: 0; border: none;">
             <div class="name-input">Name</div>
             ${parties.map(p => `<div>${p}</div>`).join('')}
             <div>Total</div>
+            <div>Action</div>
         </div>
     `;
 
@@ -44,15 +45,28 @@ function renderPredictionsEditor() {
         parties.forEach(p => total += (member[p] || 0));
 
         let row = `<div class="member-row" id="member-${i}">`;
-        row += `<input type="text" class="name-input" value="${member.name}" data-field="name" data-index="${i}">`;
+        row += `<input type="text" class="name-input" value="${member.name}" data-field="name" data-index="${i}" placeholder="Name">`;
 
         parties.forEach(p => {
             // Added oninput event to recalculate live
-            row += `<input type="number" value="${member[p]}" data-field="${p}" data-index="${i}" oninput="updateTotal(${i})">`;
+            row += `<div class="input-wrapper">
+                        <span class="mobile-label">${p}</span>
+                        <input type="number" value="${member[p]}" data-field="${p}" data-index="${i}" oninput="updateTotal(${i})">
+                    </div>`;
         });
 
         // Dynamic Total Display
-        row += `<div id="total-${i}" class="${total !== 234 ? 'warning-text' : 'success-text'}">${total}</div>`;
+        row += `<div class="input-wrapper">
+                    <span class="mobile-label">Total</span>
+                    <div id="total-${i}" class="${total !== 234 ? 'warning-text' : 'success-text'}">${total}</div>
+                </div>`;
+                
+        // Delete button
+        row += `<div class="input-wrapper">
+                    <span class="mobile-label">Delete</span>
+                    <button class="danger-btn" style="padding: 0.5rem; margin:0; width:100%;" onclick="deleteMember(${i})">🗑️</button>
+                </div>`;
+                
         row += `</div>`;
         container.innerHTML += row;
     });
@@ -75,7 +89,22 @@ function addNewMember() {
         id: Date.now(), name: "New Member", AIADMK: 0, DMK: 0, NTK: 0, TVK: 0, OTHERS: 0
     });
     renderPredictionsEditor();
+    
+    // Scroll to the bottom to show the new member
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }, 100);
 }
+
+window.deleteMember = function(index) {
+    if (confirm("Are you sure you want to remove this member?")) {
+        adminState.predictions.splice(index, 1);
+        renderPredictionsEditor();
+    }
+};
 
 async function saveAdminData() {
     parties.forEach(p => {
