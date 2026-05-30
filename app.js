@@ -69,7 +69,7 @@ function renderMap() {
 
     layoutConfig.forEach(row => {
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'flex items-center gap-2 md:gap-4 w-max relative';
+        rowDiv.className = 'flex items-center row-wrapper w-max relative';
 
         const rowLabel = row.rowId || row.id;
         const displayLabel = rowLabel.replace('1', '').replace('2', ''); // Clean up V1->V and N1->N for UI
@@ -77,14 +77,14 @@ function renderMap() {
         // STICKY ROW LABEL (Stays visible on the left when panning horizontally)
         rowDiv.innerHTML += `
             <div class="sticky left-0 z-10 bg-gray-950 py-1 pr-2">
-                <div class="w-10 h-10 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 text-sm shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
+                <div class="row-label rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
                     ${displayLabel}
                 </div>
             </div>
         `;
 
         const seatContainer = document.createElement('div');
-        seatContainer.className = 'flex gap-2 sm:gap-3 items-center';
+        seatContainer.className = 'seat-container flex items-center';
 
         // Helper function to build a physical seat block
         const createSeat = (seatId) => {
@@ -104,8 +104,8 @@ function renderMap() {
 
             return `
                 <div onclick="openActionModal('${seatId}', '${occupantData}')" 
-                     class="seat-chair shrink-0 w-11 h-11 sm:w-12 sm:h-12 ${statusClass}" title="${tooltip}">
-                    <span class="text-xs font-bold text-white/90 drop-shadow-md">${visualNumber}</span>
+                     class="seat-chair shrink-0 ${statusClass}" title="${tooltip}">
+                    <span class="font-bold text-white/90 drop-shadow-md">${visualNumber}</span>
                 </div>
             `;
         };
@@ -129,7 +129,7 @@ function renderMap() {
                 seatContainer.innerHTML += `<div class="led-container shrink-0"></div>`;
             }
 
-            seatContainer.innerHTML += `<div class="w-8 shrink-0"></div>`;
+            seatContainer.innerHTML += `<div class="aisle-gap shrink-0"></div>`;
 
             for (let i = 1; i <= 6; i++) {
                 seatContainer.innerHTML += createSeat(`${row.rowId}-${i + row.offset}`);
@@ -149,7 +149,7 @@ function renderMap() {
 
             // Visual Aisle Divider
             seatContainer.innerHTML += `
-                <div class="w-8 shrink-0 flex items-center justify-center">
+                <div class="aisle-gap shrink-0 flex items-center justify-center">
                     <div class="w-px h-8 bg-gray-700/50"></div>
                 </div>
             `;
