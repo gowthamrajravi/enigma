@@ -43,6 +43,74 @@ html {
     gap: 1rem; /* gap-4 equivalent: 16px */
 }
 
+.seat-spacer {
+    width: 2.75rem;
+    height: 2.75rem;
+}
+
+@media (min-width: 640px) {
+    .seat-spacer {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .seat-spacer {
+        width: 1.6rem;
+        height: 1.6rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .seat-spacer {
+        width: 1.35rem;
+        height: 1.35rem;
+    }
+}
+
+.led-container {
+    width: calc(7 * 2.75rem + 6 * 0.5rem);
+    height: 2.75rem;
+}
+
+.led-box {
+    width: 100%;
+    height: calc(2 * 2.75rem + 1.25rem); /* 2 rows + gap-5 */
+}
+
+@media (min-width: 640px) {
+    .led-container {
+        width: calc(7 * 3rem + 6 * 0.75rem);
+        height: 3rem;
+    }
+    .led-box {
+        height: calc(2 * 3rem + 1.5rem); /* 2 rows + gap-6 */
+    }
+}
+
+@media (max-width: 480px) {
+    .led-container {
+        width: calc(7 * 1.6rem + 6 * 0.17rem);
+        height: 1.6rem;
+    }
+    .led-box {
+        height: calc(2 * 1.6rem + 0.6rem); /* 2 rows + gap 0.6rem */
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .led-container {
+        width: calc(7 * 1.35rem + 6 * 0.12rem);
+        height: 1.35rem;
+    }
+    .led-box {
+        height: calc(2 * 1.35rem + 0.6rem); /* 2 rows + gap 0.6rem */
+        font-size: 7px;
+    }
+}
+
 /* Subtle Armrests */
 .seat-chair::before, .seat-chair::after {
     content: '';

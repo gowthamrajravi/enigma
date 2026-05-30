@@ -1,16 +1,38 @@
+
+// ==========================================
+// 1. STATE & COMPLEX LAYOUT CONFIGURATION
+// ==========================================
 let currentDataArray = [];
-let layoutRows = ['V', 'Misc', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
 
-function parseSeat(seatNo) {
-    if (!seatNo) return { row: '', num: 0 };
-    if (!seatNo.includes('-')) {
-        return { row: 'Misc', num: parseInt(seatNo, 10) || 0 };
-    }
-    const [row, numStr] = seatNo.split('-');
-    return { row, num: parseInt(numStr, 10) || 0 };
-}
-const SEATS_PER_ROW = 12;
+// The physical architecture of The Enigma hall
+const layoutConfig = [
+    { id: 'V1', left: 4, right: 2 },
+    { id: 'V2', left: 4, right: 2 },
+    { id: 'A', left: 7, right: 6 },
+    { id: 'B', left: 7, right: 6 },
+    { id: 'C', left: 7, right: 6 },
+    { id: 'D', left: 7, right: 6 },
+    { id: 'E', left: 6, right: 6 },  // Exception Row
+    { id: 'F', left: 7, right: 6 },
+    { id: 'G', left: 7, right: 6 },
+    { id: 'H', left: 7, right: 6 },
+    { id: 'I', left: 7, right: 6 },
+    { id: 'J', left: 7, right: 6 },
+    { id: 'K', left: 6, right: 6 },  // Exception Row
+    { id: 'L', left: 7, right: 6 },
+    { id: 'M', left: 5, right: 6 },  // Exception Row
 
+    // N row is split into two halves, rendered entirely on the right side
+    { id: 'N1', rowId: 'N', offset: 0, layout: 'n_row' },
+    { id: 'N2', rowId: 'N', offset: 6, layout: 'n_row' }
+];
+
+// Calculate total capacity dynamically based on the layout
+const TOTAL_CAPACITY = layoutConfig.reduce((acc, row) => acc + row.left + row.right + (row.layout === 'n_row' ? 6 : 0), 0);
+
+// ==========================================
+// 2. INITIALIZATION & SYNC
+// ==========================================
 db.ref('/').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -30,41 +52,43 @@ function renderApp() {
 }
 
 function updateStats() {
-    const estimatedCapacity = (15 * 12) + 10;
     const assigned = currentDataArray.length;
     const checked = currentDataArray.filter(s => s.checkedIn).length;
 
-    document.getElementById('stat-total').innerText = estimatedCapacity;
+    document.getElementById('stat-total').innerText = 189; // Hardcoded based on your exact math
     document.getElementById('stat-assigned').innerText = assigned;
     document.getElementById('stat-checked').innerText = checked;
 }
 
+// ==========================================
+// 3. MAP VIEW (DYNAMIC ARCHITECTURE)
+// ==========================================
 function renderMap() {
     const grid = document.getElementById('seatingGrid');
     grid.innerHTML = '';
 
-    layoutRows.forEach(rowLetter => {
+    layoutConfig.forEach(row => {
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'flex items-center row-wrapper w-max relative';
+        rowDiv.className = 'flex items-center gap-2 md:gap-4 w-max relative';
 
-        // STICKY ROW LABEL
+        const rowLabel = row.rowId || row.id;
+        const displayLabel = rowLabel.replace('1', '').replace('2', ''); // Clean up V1->V and N1->N for UI
+
+        // STICKY ROW LABEL (Stays visible on the left when panning horizontally)
         rowDiv.innerHTML += `
             <div class="sticky left-0 z-10 bg-gray-950 py-1 pr-2">
-                <div class="row-label rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
-                    ${rowLetter === 'Misc' ? '★' : rowLetter}
+                <div class="w-10 h-10 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 text-sm shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
+                    ${displayLabel}
                 </div>
             </div>
         `;
 
         const seatContainer = document.createElement('div');
-        seatContainer.className = 'seat-container flex items-center';
+        seatContainer.className = 'flex gap-2 sm:gap-3 items-center';
 
-        const slotsToRender = rowLetter === 'Misc' ? 10 : SEATS_PER_ROW;
-
-        for (let i = 1; i <= slotsToRender; i++) {
-            const seatId = rowLetter === 'Misc' ? `${i}` : `${rowLetter}-${i}`;
+        // Helper function to build a physical seat block
+        const createSeat = (seatId) => {
             const occupant = currentDataArray.find(s => s.seat_no === seatId);
-
             let statusClass = 'seat-empty';
             let tooltip = `Empty (${seatId})`;
             let occupantData = null;
@@ -75,16 +99,63 @@ function renderMap() {
                 occupantData = encodeURIComponent(JSON.stringify(occupant));
             }
 
-            seatContainer.innerHTML += `
+            // Extract just the number for the visual seat (e.g., "12" from "A-12")
+            const visualNumber = seatId.split('-')[1] || seatId.replace(/[A-Za-z]/g, '');
+
+            return `
                 <div onclick="openActionModal('${seatId}', '${occupantData}')" 
-                     class="seat-chair shrink-0 ${statusClass}" title="${tooltip}">
-                    <span class="font-bold text-white/90 drop-shadow-md">${i}</span>
+                     class="seat-chair shrink-0 w-11 h-11 sm:w-12 sm:h-12 ${statusClass}" title="${tooltip}">
+                    <span class="text-xs font-bold text-white/90 drop-shadow-md">${visualNumber}</span>
+                </div>
+            `;
+        };
+
+        // --- RENDER LOGIC BASED ON ROW TYPE ---
+
+        if (row.layout === 'n_row') {
+            // N-Row Special Layout: 
+            // 1. LED Container on Left (7 seats wide) 
+            // 2. Aisle 
+            // 3. N Seats (Right Side)
+            if (row.id === 'N1') {
+                seatContainer.innerHTML += `
+                    <div class="relative shrink-0 led-container">
+                        <div class="led-box absolute top-0 left-0 w-full flex items-center justify-center bg-gray-800/80 border-2 border-dashed border-gray-600 rounded-lg text-gray-400 font-bold text-[10px] uppercase tracking-widest text-center leading-tight z-20">
+                            <span>LED & Speaker<br>Control Space</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                seatContainer.innerHTML += `<div class="led-container shrink-0"></div>`;
+            }
+
+            seatContainer.innerHTML += `<div class="w-8 shrink-0"></div>`;
+
+            for (let i = 1; i <= 6; i++) {
+                seatContainer.innerHTML += createSeat(`${row.rowId}-${i + row.offset}`);
+            }
+        }
+
+        else {
+            // Standard Rows (Left Block + Aisle + Right Block)
+            const missingLeft = 7 - row.left;
+            for (let s = 0; s < missingLeft; s++) {
+                seatContainer.innerHTML += `<div class="seat-spacer shrink-0"></div>`;
+            }
+
+            for (let i = 1; i <= row.left; i++) {
+                seatContainer.innerHTML += createSeat(`${row.id}-${i}`);
+            }
+
+            // Visual Aisle Divider
+            seatContainer.innerHTML += `
+                <div class="w-8 shrink-0 flex items-center justify-center">
+                    <div class="w-px h-8 bg-gray-700/50"></div>
                 </div>
             `;
 
-            // Large visual aisle gap
-            if (i === 6) {
-                seatContainer.innerHTML += `<div class="aisle-gap shrink-0"></div>`;
+            for (let i = 1; i <= row.right; i++) {
+                seatContainer.innerHTML += createSeat(`${row.id}-${i + row.left}`);
             }
         }
 
@@ -92,7 +163,7 @@ function renderMap() {
         grid.appendChild(rowDiv);
     });
 
-    // Automatically scroll the map to the middle so the user sees the center aisle on load
+    // Auto-scroll map to the center aisle on load
     setTimeout(() => {
         const scrollContainer = document.getElementById('map-scroll-container');
         if (scrollContainer && scrollContainer.scrollWidth > scrollContainer.clientWidth) {
@@ -101,6 +172,9 @@ function renderMap() {
     }, 100);
 }
 
+// ==========================================
+// 4. LIST VIEW & SEARCH
+// ==========================================
 document.getElementById('listSearch').addEventListener('input', renderList);
 
 function renderList() {
@@ -114,15 +188,12 @@ function renderList() {
         (s.ticket_no && String(s.ticket_no).toLowerCase().includes(query))
     );
 
+    // Natural sort for seat numbers (so A-2 comes before A-10)
     filtered.sort((a, b) => {
-        const seatA = parseSeat(a.seat_no);
-        const seatB = parseSeat(b.seat_no);
-        const indexA = layoutRows.indexOf(seatA.row);
-        const indexB = layoutRows.indexOf(seatB.row);
-        if (indexA !== indexB) {
-            return indexA - indexB;
-        }
-        return seatA.num - seatB.num;
+        const [aRow, aNum] = (a.seat_no || '').split('-');
+        const [bRow, bNum] = (b.seat_no || '').split('-');
+        if (aRow !== bRow) return (aRow || '').localeCompare(bRow || '');
+        return parseInt(aNum || 0) - parseInt(bNum || 0);
     });
 
     filtered.forEach(seat => {
@@ -141,7 +212,7 @@ function renderList() {
                 <span class="px-2.5 py-1 rounded-md text-[11px] font-bold ${badgeColor}">${badgeText}</span>
             </td>
             <td class="p-4 text-center w-16">
-                <button onclick="openActionModal('${seat.seat_no}', '${occData}')" class="bg-gray-700 hover:bg-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                <button onclick="openActionModal('${seat.seat_no}', '${occData}')" class="bg-gray-700 hover:bg-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm">
                     ✎
                 </button>
             </td>
@@ -150,6 +221,9 @@ function renderList() {
     });
 }
 
+// ==========================================
+// 5. MODAL & CRUD LOGIC
+// ==========================================
 function openActionModal(seatId, encodedOccupant) {
     const modal = document.getElementById('actionModal');
     const content = document.getElementById('actionModalContent');
@@ -206,6 +280,9 @@ function openWalkInModal() {
     document.getElementById('modalNewSeat').value = "";
 }
 
+// ==========================================
+// 6. FIREBASE OPERATIONS
+// ==========================================
 function toggleCheckIn(dbKey, currentlyCheckedIn) {
     db.ref('/' + dbKey).update({ checkedIn: !currentlyCheckedIn });
     closeModal();
@@ -250,6 +327,9 @@ function deleteSeat() {
     }
 }
 
+// ==========================================
+// 7. UI TABS & HELPERS
+// ==========================================
 function switchTab(tab) {
     document.getElementById('view-map').classList.toggle('hidden', tab !== 'map');
     document.getElementById('view-list').classList.toggle('hidden', tab !== 'list');
@@ -271,3 +351,4 @@ function updateConnectionStatus(isConnected) {
         text.innerText = "Offline";
     }
 }
+
