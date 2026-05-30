@@ -1,5 +1,14 @@
 let currentDataArray = [];
-let layoutRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'V', 'Misc'];
+let layoutRows = ['V', 'Misc', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+
+function parseSeat(seatNo) {
+    if (!seatNo) return { row: '', num: 0 };
+    if (!seatNo.includes('-')) {
+        return { row: 'Misc', num: parseInt(seatNo, 10) || 0 };
+    }
+    const [row, numStr] = seatNo.split('-');
+    return { row, num: parseInt(numStr, 10) || 0 };
+}
 const SEATS_PER_ROW = 12;
 
 db.ref('/').on('value', (snapshot) => {
@@ -35,21 +44,20 @@ function renderMap() {
     grid.innerHTML = '';
 
     layoutRows.forEach(rowLetter => {
-        // Container must be w-max to prevent flexbox from squishing contents
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'flex items-center gap-4 w-max relative';
+        rowDiv.className = 'flex items-center row-wrapper w-max relative';
 
-        // STICKY ROW LABEL: Stays visible on the left when panning horizontally
+        // STICKY ROW LABEL
         rowDiv.innerHTML += `
             <div class="sticky left-0 z-10 bg-gray-950 py-1 pr-2">
-                <div class="w-10 h-10 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 text-sm shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
+                <div class="row-label rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center font-bold text-purple-300 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
                     ${rowLetter === 'Misc' ? '★' : rowLetter}
                 </div>
             </div>
         `;
 
         const seatContainer = document.createElement('div');
-        seatContainer.className = 'flex gap-2 sm:gap-3 items-center';
+        seatContainer.className = 'seat-container flex items-center';
 
         const slotsToRender = rowLetter === 'Misc' ? 10 : SEATS_PER_ROW;
 
@@ -67,17 +75,16 @@ function renderMap() {
                 occupantData = encodeURIComponent(JSON.stringify(occupant));
             }
 
-            // Fixed size seats (w-11 h-11) that do not shrink
             seatContainer.innerHTML += `
                 <div onclick="openActionModal('${seatId}', '${occupantData}')" 
-                     class="seat-chair shrink-0 w-11 h-11 sm:w-12 sm:h-12 ${statusClass}" title="${tooltip}">
-                    <span class="text-xs font-bold text-white/90 drop-shadow-md">${i}</span>
+                     class="seat-chair shrink-0 ${statusClass}" title="${tooltip}">
+                    <span class="font-bold text-white/90 drop-shadow-md">${i}</span>
                 </div>
             `;
 
             // Large visual aisle gap
-            if (i === 6 && rowLetter !== 'Misc') {
-                seatContainer.innerHTML += `<div class="w-8 shrink-0"></div>`;
+            if (i === 6) {
+                seatContainer.innerHTML += `<div class="aisle-gap shrink-0"></div>`;
             }
         }
 
@@ -107,7 +114,16 @@ function renderList() {
         (s.ticket_no && String(s.ticket_no).toLowerCase().includes(query))
     );
 
-    filtered.sort((a, b) => (a.seat_no || '').localeCompare(b.seat_no || ''));
+    filtered.sort((a, b) => {
+        const seatA = parseSeat(a.seat_no);
+        const seatB = parseSeat(b.seat_no);
+        const indexA = layoutRows.indexOf(seatA.row);
+        const indexB = layoutRows.indexOf(seatB.row);
+        if (indexA !== indexB) {
+            return indexA - indexB;
+        }
+        return seatA.num - seatB.num;
+    });
 
     filtered.forEach(seat => {
         const tr = document.createElement('tr');
