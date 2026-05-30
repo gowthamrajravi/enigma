@@ -1,5 +1,5 @@
 let currentDataArray = [];
-let layoutRows = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','V','Misc'];
+let layoutRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'V', 'Misc'];
 const SEATS_PER_ROW = 12;
 
 db.ref('/').on('value', (snapshot) => {
@@ -21,10 +21,10 @@ function renderApp() {
 }
 
 function updateStats() {
-    const estimatedCapacity = (15 * 12) + 10; 
+    const estimatedCapacity = (15 * 12) + 10;
     const assigned = currentDataArray.length;
     const checked = currentDataArray.filter(s => s.checkedIn).length;
-    
+
     document.getElementById('stat-total').innerText = estimatedCapacity;
     document.getElementById('stat-assigned').innerText = assigned;
     document.getElementById('stat-checked').innerText = checked;
@@ -33,12 +33,12 @@ function updateStats() {
 function renderMap() {
     const grid = document.getElementById('seatingGrid');
     grid.innerHTML = '';
-    
+
     layoutRows.forEach(rowLetter => {
         // Container must be w-max to prevent flexbox from squishing contents
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'flex items-center gap-4 w-max relative'; 
-        
+        rowDiv.className = 'flex items-center gap-4 w-max relative';
+
         // STICKY ROW LABEL: Stays visible on the left when panning horizontally
         rowDiv.innerHTML += `
             <div class="sticky left-0 z-10 bg-gray-950 py-1 pr-2">
@@ -47,16 +47,16 @@ function renderMap() {
                 </div>
             </div>
         `;
-        
+
         const seatContainer = document.createElement('div');
         seatContainer.className = 'flex gap-2 sm:gap-3 items-center';
-        
+
         const slotsToRender = rowLetter === 'Misc' ? 10 : SEATS_PER_ROW;
-        
+
         for (let i = 1; i <= slotsToRender; i++) {
             const seatId = rowLetter === 'Misc' ? `${i}` : `${rowLetter}-${i}`;
             const occupant = currentDataArray.find(s => s.seat_no === seatId);
-            
+
             let statusClass = 'seat-empty';
             let tooltip = `Empty (${seatId})`;
             let occupantData = null;
@@ -74,13 +74,13 @@ function renderMap() {
                     <span class="text-xs font-bold text-white/90 drop-shadow-md">${i}</span>
                 </div>
             `;
-            
+
             // Large visual aisle gap
             if (i === 6 && rowLetter !== 'Misc') {
-                seatContainer.innerHTML += `<div class="w-8 shrink-0"></div>`; 
+                seatContainer.innerHTML += `<div class="w-8 shrink-0"></div>`;
             }
         }
-        
+
         rowDiv.appendChild(seatContainer);
         grid.appendChild(rowDiv);
     });
@@ -101,8 +101,8 @@ function renderList() {
     const query = document.getElementById('listSearch').value.toLowerCase();
     tbody.innerHTML = '';
 
-    const filtered = currentDataArray.filter(s => 
-        (s.name && s.name.toLowerCase().includes(query)) || 
+    const filtered = currentDataArray.filter(s =>
+        (s.name && s.name.toLowerCase().includes(query)) ||
         (s.seat_no && s.seat_no.toLowerCase().includes(query)) ||
         (s.ticket_no && String(s.ticket_no).toLowerCase().includes(query))
     );
@@ -138,7 +138,7 @@ function openActionModal(seatId, encodedOccupant) {
     const modal = document.getElementById('actionModal');
     const content = document.getElementById('actionModalContent');
     const checkBtn = document.getElementById('modalCheckInBtn');
-    
+
     document.getElementById('modalSeatNo').innerText = seatId;
     document.getElementById('modalNewSeat').value = seatId;
 
@@ -147,9 +147,9 @@ function openActionModal(seatId, encodedOccupant) {
         document.getElementById('modalDbKey').value = occupant.dbKey;
         document.getElementById('modalName').value = occupant.name;
         document.getElementById('modalTicket').value = occupant.ticket_no;
-        
+
         checkBtn.onclick = () => toggleCheckIn(occupant.dbKey, occupant.checkedIn);
-        
+
         if (occupant.checkedIn) {
             checkBtn.innerText = "Undo Check-in";
             checkBtn.className = "w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-colors bg-gray-700 hover:bg-gray-600 text-white";
@@ -161,7 +161,7 @@ function openActionModal(seatId, encodedOccupant) {
         document.getElementById('modalDbKey').value = 'NEW';
         document.getElementById('modalName').value = '';
         document.getElementById('modalTicket').value = 'WALK-IN';
-        
+
         checkBtn.innerText = "Assign & Check In";
         checkBtn.className = "w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-colors bg-blue-600 hover:bg-blue-500 text-white";
         checkBtn.onclick = () => saveSeatEdits(true);
@@ -177,7 +177,7 @@ function openActionModal(seatId, encodedOccupant) {
 function closeModal() {
     const modal = document.getElementById('actionModal');
     const content = document.getElementById('actionModalContent');
-    
+
     modal.classList.remove('modal-show');
     content.classList.remove('modal-content-show');
     setTimeout(() => modal.classList.add('hidden'), 300);
@@ -201,7 +201,7 @@ function saveSeatEdits(autoCheckIn = false) {
     const newTicket = document.getElementById('modalTicket').value;
     const targetSeat = document.getElementById('modalNewSeat').value;
 
-    if(!newName || !targetSeat) {
+    if (!newName || !targetSeat) {
         alert("Name and Seat are required.");
         return;
     }
@@ -227,8 +227,8 @@ function deleteSeat() {
         closeModal();
         return;
     }
-    
-    if(confirm("Are you sure you want to clear this seat? The guest data will be removed.")) {
+
+    if (confirm("Are you sure you want to clear this seat? The guest data will be removed.")) {
         db.ref('/' + dbKey).remove();
         closeModal();
     }
@@ -237,7 +237,7 @@ function deleteSeat() {
 function switchTab(tab) {
     document.getElementById('view-map').classList.toggle('hidden', tab !== 'map');
     document.getElementById('view-list').classList.toggle('hidden', tab !== 'list');
-    
+
     document.getElementById('tab-map').className = tab === 'map' ? 'pb-3 border-b-2 border-purple-500 text-purple-400 whitespace-nowrap' : 'pb-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 whitespace-nowrap';
     document.getElementById('tab-list').className = tab === 'list' ? 'pb-3 border-b-2 border-purple-500 text-purple-400 whitespace-nowrap' : 'pb-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 whitespace-nowrap';
 }
