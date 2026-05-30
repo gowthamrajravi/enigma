@@ -1,124 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TN 2026 Election Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Enigma - Box Office Desk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col font-sans overflow-hidden">
 
-<body>
-    <header>
-        <h1>TN 2026 Election Results</h1>
-        <p>A Family Prediction Initiative by <strong>Mr. Ramesh Subramanian</strong></p>
-        <p class="refresh-time">Last Refreshed: <span id="time-display">--:--</span></p>
+    <header class="bg-gray-800 border-b border-gray-700 z-30 shadow-lg shrink-0">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-row justify-between items-center">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold text-purple-400">The Enigma Desk</h1>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span id="connection-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                    <span id="connection-status" class="text-[10px] sm:text-xs text-yellow-500">Connecting...</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-2 sm:gap-4 text-xs sm:text-sm font-medium bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-700">
+                <div class="text-center px-1"><div class="text-gray-400 text-[10px]">Total</div><div id="stat-total" class="text-white">0</div></div>
+                <div class="text-center px-1 border-l border-gray-700"><div class="text-gray-400 text-[10px]">Assigned</div><div id="stat-assigned" class="text-blue-400">0</div></div>
+                <div class="text-center px-1 border-l border-gray-700"><div class="text-gray-400 text-[10px]">Arrived</div><div id="stat-checked" class="text-green-400">0</div></div>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 flex gap-6 text-sm font-semibold mt-1 overflow-x-auto hide-scrollbar">
+            <button onclick="switchTab('map')" id="tab-map" class="pb-3 border-b-2 border-purple-500 text-purple-400 whitespace-nowrap">Seat Map</button>
+            <button onclick="switchTab('list')" id="tab-list" class="pb-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 whitespace-nowrap">Guest List & Walk-ins</button>
+        </div>
     </header>
 
-    <!-- NEW: Loading Screen -->
-    <div id="loading-screen">
-        <div class="spinner"></div>
-        <p>Fetching Live Election Data...</p>
-    </div>
-
-    <!-- main content hidden until data loads -->
-    <main id="main-content" style="display: none;">
-        <!-- Live Real-World Election Standings -->
-        <div class="card" style="display: block; margin-bottom: 2rem; border-top: 5px solid #10b981;">
-            <h2 style="margin-top: 0; color: #1e3a8a;">📊 Official Live Results</h2>
-            <p style="color: #64748b; margin-top: -10px; margin-bottom: 1rem;">
-                Real-time seat distribution. <br>
-                <strong style="color: #0f172a; font-size: 1.1rem;">Total Seats Counted: <span
-                        id="seats-counted">0</span> / 234</strong>
-            </p>
-            <div id="live-standings-wrapper"
-                style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;">
-                <p id="waiting-message" style="color: #64748b; font-style: italic;">Waiting for live results to begin...
-                </p>
-                <canvas id="liveStandingsChart" style="display: none;"></canvas>
-            </div>
-        </div>
-
-        <!-- Advanced Analytics Panel -->
-        <div class="insights-container">
-            <div class="insight-box">
-                <h3>👥 Family Consensus (Mean Average)</h3>
-                <p id="family-average-text">Calculating...</p>
-                <small>The collective prediction of all family members combined.</small>
-            </div>
-            <div class="insight-box">
-                <h3>🎯 The "Wisdom of the Crowd"</h3>
-                <p id="closest-to-average" style="font-weight: bold; color: #1e3a8a;">Calculating...</p>
-                <small>The person whose prediction has the minimum variance from the family average.</small>
-            </div>
-        </div>
-
-        <div class="leaderboard-container">
-            <h2>Live Leaderboard</h2>
-            <p style="text-align:center; color:#64748b; margin-bottom:1rem;">Click on any family member to see their Pie
-                Chart breakdown!</p>
+    <main class="w-full flex-grow relative overflow-hidden bg-gray-950">
+        
+        <div id="view-map" class="absolute inset-0 block">
+            <div class="w-full h-full overflow-auto hide-scrollbar relative" id="map-scroll-container">
                 
-            <div class="leaderboard-controls">
-                <input type="text" id="search-input" placeholder="Search by name..." oninput="renderLeaderboard()">
-                <select id="sort-select" onchange="renderLeaderboard()">
-                    <option value="accuracy-desc">Sort by Accuracy (High to Low)</option>
-                    <option value="accuracy-asc">Sort by Accuracy (Low to High)</option>
-                    <option value="seats-asc">Sort by Seat Diff (Low to High)</option>
-                    <option value="name-asc">Sort by Name (A-Z)</option>
-                </select>
+                <div class="min-w-max p-6 sm:p-10 flex flex-col items-center mx-auto pb-32">
+                    
+                    <div class="w-[80%] h-12 bg-gradient-to-b from-gray-700 to-gray-800 rounded-b-[40px] border-b-4 border-purple-500 flex items-center justify-center mb-12 shadow-[0_10px_30px_rgba(168,85,247,0.2)]">
+                        <span class="text-gray-300 font-bold uppercase tracking-[0.3em] text-xs">Main Stage</span>
+                    </div>
+                    
+                    <div id="seatingGrid" class="flex flex-col gap-5 sm:gap-6 relative">
+                        </div>
+                </div>
             </div>
+            
+            <div class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none">
+                <div class="bg-gray-800/80 backdrop-blur px-4 py-2 rounded-full border border-gray-700 text-xs text-gray-300 shadow-lg animate-pulse">
+                    ↔ Swipe map to navigate
+                </div>
+            </div>
+        </div>
 
-            <div id="leaderboard"></div>
+        <div id="view-list" class="absolute inset-0 hidden overflow-y-auto bg-gray-900 p-4 pb-32">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex gap-3 mb-4">
+                    <input type="text" id="listSearch" placeholder="Search guests..." class="flex-grow p-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-purple-500 outline-none text-sm">
+                    <button onclick="openWalkInModal()" class="bg-purple-600 hover:bg-purple-500 px-4 rounded-xl font-bold shadow-lg transition-colors text-sm whitespace-nowrap">+ Walk-in</button>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+                    <table class="w-full text-left border-collapse">
+                        <tbody id="listTableBody" class="divide-y divide-gray-700 text-sm">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Welcome Modal -->
-    <div id="welcome-modal" class="modal show">
-        <div class="modal-content">
-            <h2>Welcome to the Arena!</h2>
-            <p>Mr. Ramesh Subramanian challenges the family: Who has the best political instincts?</p>
-            <p>Scores are calculated dynamically based on the ratio of predicted seats versus actual live results.</p>
-            <button onclick="document.getElementById('welcome-modal').classList.remove('show')">Let's Go!</button>
-        </div>
-    </div>
+    <div id="actionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center opacity-0 transition-opacity pb-safe">
+        <div class="bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-gray-700 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300" id="actionModalContent">
+            
+            <div class="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mb-5 sm:hidden"></div>
 
-    <div id="chart-modal" class="modal">
-        <div class="modal-content" style="max-width: 800px; width: 90%;">
-            <!-- NEW: Floating Close Button -->
-            <button class="floating-close-btn"
-                onclick="document.getElementById('chart-modal').classList.remove('show')">✖ Close</button>
-
-            <h2 id="chart-title" style="margin-top: 10px;">Prediction Breakdown</h2>
-            <p id="chart-subtitle" style="color: #64748b; margin-bottom: 20px;"></p>
-
-            <div class="charts-wrapper">
-                <div class="chart-half">
-                    <h3>Predicted</h3>
-                    <div id="predicted-chart-container"><canvas id="predictedChart"></canvas></div>
+            <div class="flex justify-between items-start mb-5">
+                <h2 class="text-2xl font-bold text-white">Seat <span id="modalSeatNo" class="text-purple-400"></span></h2>
+                <button onclick="closeModal('actionModal')" class="text-gray-400 hover:text-white text-3xl leading-none -mt-1">&times;</button>
+            </div>
+            
+            <input type="hidden" id="modalDbKey">
+            
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-400 mb-1.5 uppercase">Guest Name</label>
+                <input type="text" id="modalName" class="w-full p-3.5 rounded-xl bg-gray-900 border border-gray-600 text-white focus:border-purple-500 outline-none">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1.5 uppercase">Ticket No</label>
+                    <input type="text" id="modalTicket" class="w-full p-3.5 rounded-xl bg-gray-900 border border-gray-600 text-white focus:border-purple-500 outline-none">
                 </div>
-                <div class="chart-half">
-                    <h3>Live Actuals</h3>
-                    <div id="actual-chart-container"><canvas id="actualChart"></canvas></div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1.5 uppercase">Seat Swap</label>
+                    <input type="text" id="modalNewSeat" class="w-full p-3.5 rounded-xl bg-gray-900 border border-gray-600 text-white focus:border-purple-500 outline-none" placeholder="e.g. A-5">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button id="modalCheckInBtn" class="w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-colors"></button>
+                <div class="flex gap-3 mt-2">
+                    <button onclick="saveSeatEdits()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3.5 rounded-xl text-white font-medium transition-colors">Save Edits</button>
+                    <button onclick="deleteSeat()" class="flex-1 bg-red-900/40 hover:bg-red-800/60 border border-red-800/50 py-3.5 rounded-xl text-red-300 font-medium transition-colors">Clear Seat</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Spectacle Modal -->
-    <div id="spectacle-modal" class="modal">
-        <div class="modal-content finale">
-            <h1>🏆 THE RESULTS ARE IN 🏆</h1>
-            <h2 id="winner-name"></h2>
-            <p>is the Ultimate Political Analyst!</p>
-            <h3 id="winner-score"></h3>
-            <button onclick="document.getElementById('spectacle-modal').classList.remove('show')">View Final
-                Standings</button>
-        </div>
-    </div>
-
+    <script src="config.js"></script>
     <script src="app.js"></script>
 </body>
-
 </html>

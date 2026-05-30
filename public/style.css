@@ -1,0 +1,67 @@
+html {
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none; /* Prevents annoying pull-to-refresh on mobile */
+}
+
+/* Fixed, tactile seat design */
+.seat-chair {
+    border-radius: 8px 8px 4px 4px;
+    border-bottom: 5px solid rgba(0,0,0,0.3);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+}
+
+/* Subtle Armrests */
+.seat-chair::before, .seat-chair::after {
+    content: '';
+    position: absolute;
+    top: 35%;
+    width: 3px;
+    height: 35%;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+}
+.seat-chair::before { left: 2px; }
+.seat-chair::after { right: 2px; }
+
+/* Status Colors */
+.seat-empty {
+    background-color: #374151; 
+    border: 1px solid #4b5563;
+}
+.seat-assigned {
+    background-color: #2563eb; 
+    border: 1px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.seat-checked-in {
+    background-color: #10b981; 
+    border: 1px solid #34d399;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.seat-chair:active {
+    transform: scale(0.90) translateY(2px);
+    border-bottom-width: 2px;
+}
+
+/* Smooth Modals */
+.modal-show {
+    display: flex !important;
+    opacity: 1 !important;
+}
+.modal-content-show {
+    transform: translateY(0) scale(1) !important;
+}
+
+/* Invisible but functional scrollbars */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
